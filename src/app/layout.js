@@ -6,8 +6,8 @@ const geist = Geist({
 });
 
 export const metadata = {
-  title: "Next.js App",
-  description: "Built with Next.js",
+  title: "Top10 YC",
+  description: "AI-Powered Search for the Y Combinator Startup Directory",
 };
 
 export default function RootLayout({ children }) {

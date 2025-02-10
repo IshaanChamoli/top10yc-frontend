@@ -120,7 +120,7 @@ export default function Home() {
               <span className="text-[var(--yc-orange)]">YC</span>
             </h1>
             <div className="text-gray-600 text-xl max-w-2xl mx-auto">
-              Better Search for the Y Combinator Startup Directory
+              AI-Powered Search for the Y Combinator Startup Directory
             </div>
           </header>
 

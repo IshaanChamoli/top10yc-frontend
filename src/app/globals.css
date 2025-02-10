@@ -50,7 +50,25 @@ body {
 
 @layer components {
   .company-card {
-    @apply bg-white rounded-xl p-6 shadow-sm transition-all duration-300 relative border border-gray-200 flex flex-col cursor-pointer no-underline text-inherit hover:-translate-y-1 hover:shadow-md hover:border-[var(--yc-orange-light)];
+    @apply bg-white rounded-xl p-6 shadow-sm transition-all duration-300 relative border border-gray-200 flex flex-col cursor-pointer no-underline text-inherit 
+    hover:-translate-y-3 
+    hover:shadow-xl
+    hover:border-[var(--yc-orange)]
+    hover:scale-[1.03]
+    hover:ring-4
+    hover:ring-[var(--yc-orange)]
+    hover:ring-opacity-40
+    hover:bg-[#fff8f4]
+    after:content-['Click_to_view_→']
+    after:absolute
+    after:bottom-3
+    after:right-4
+    after:text-[var(--yc-orange)]
+    after:font-medium
+    after:opacity-0
+    hover:after:opacity-100
+    after:transition-opacity
+    after:duration-200;
   }
 
   .company-number {
