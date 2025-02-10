@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,8 +58,8 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [currentExampleIndex]);
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
       setCompanies([]);
       setError(null);
       return;
@@ -66,21 +68,45 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     setHasSearched(true);
-    
+
     try {
+      // console.log('🔍 Search initiated:', {
+      //   query,
+      //   timestamp: new Date().toISOString()
+      // });
+
+      // Try to store search query in Firebase, but don't block if it fails
+      try {
+        // console.log('📝 Storing search in Firebase...');
+        const searchData = {
+          query: query,
+          timestamp: serverTimestamp(),
+          createdAt: new Date().toISOString()
+        };
+
+        const searchesCollection = collection(db, 'searches');
+        const docRef = doc(searchesCollection, query);
+        await setDoc(docRef, searchData);
+        // console.log('✅ Search stored in Firebase with query as ID:', query);
+      } catch (firebaseError) {
+        // Silently handle Firebase errors - don't let them affect the main search
+        // console.error('Firebase storage failed, continuing with search:', firebaseError);
+      }
+
+      // Process the search - this continues regardless of Firebase status
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: searchTerm,
+          query: query,
           limit: 10
         }),
       });
 
       const data = await response.json();
-      
+
       if (response.status === 429) {
         throw new Error(`Rate limit exceeded. ${data.details}`);
       }
@@ -88,15 +114,17 @@ export default function Home() {
       if (data.error) {
         throw new Error(data.error);
       }
-      
+
       if (data.companies) {
         setCompanies(data.companies.map(match => ({
           ...match.metadata,
+          logo_url: match.metadata.logo_url === "na" ? null : match.metadata.logo_url,
           score: match.score
         })));
       }
+
     } catch (error) {
-      console.error('Error searching companies:', error);
+      // console.error('❌ Search Error:', error);
       setError(error.message);
       setCompanies([]);
     } finally {
@@ -106,7 +134,7 @@ export default function Home() {
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch();
+      handleSearch(searchTerm);
     }
   };
 
@@ -135,7 +163,7 @@ export default function Home() {
                 onKeyPress={handleKeyPress}
               />
               <button
-                onClick={handleSearch}
+                onClick={() => handleSearch(searchTerm)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[var(--yc-orange)] transition-colors"
                 aria-label="Search"
               >

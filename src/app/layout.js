@@ -1,19 +1,21 @@
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { FirebaseInitializer } from './components/FirebaseInitializer';
 
-const geist = Geist({
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Top10 YC",
-  description: "AI-Powered Search for the Y Combinator Startup Directory",
+  title: "Top 10 YC",
+  description: "Find YOUR top 10 YC companies",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geist.className} antialiased`}>{children}</body>
+      <body className={inter.className}>
+        <FirebaseInitializer />
+        {children}
+      </body>
     </html>
   );
 }
